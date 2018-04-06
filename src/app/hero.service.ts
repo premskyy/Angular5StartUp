@@ -15,7 +15,8 @@ const httpOptions = {
 @Injectable()
 export class HeroService {
 
-  private heroesUrl = 'api/heroes';  // URL to web api
+  // private heroesUrl = 'api/heroes';  // URL to web api
+  private heroesUrl = 'http://localhost:3000/hero';  // URL to web api
 
   constructor(
     private http: HttpClient,
@@ -23,7 +24,7 @@ export class HeroService {
 
   /** GET heroes from the server */
   getHeroes(): Observable<Hero[]> {
-    return this.http.get<Hero[]>('http://localhost:3000/hero')
+    return this.http.get<Hero[]>(this.heroesUrl)
       .pipe(
         tap(heroes => this.log(`fetched heroes`)),
         catchError(this.handleError('getHeroes', []))
@@ -69,15 +70,16 @@ export class HeroService {
 
   /** POST: add a new hero to the server */
   addHero(hero: Hero): Observable<Hero> {
-    return this.http.post<Hero>('http://localhost:3000/hero', hero, httpOptions).pipe(
+    return this.http.post<Hero>(this.heroesUrl, hero, httpOptions).pipe(
       tap((hero: Hero) => this.log(`added hero w/ id=${hero.id}`)),
       catchError(this.handleError<Hero>('addHero'))
     );
   }
 
   /** DELETE: delete the hero from the server */
-  deleteHero(hero: Hero | number): Observable<Hero> {
-    const id = typeof hero === 'number' ? hero : hero.id;
+  deleteHero(hero: Hero): Observable<Hero> {
+    console.log(hero);
+    const id = hero._id;
     const url = `${this.heroesUrl}/${id}`;
 
     return this.http.delete<Hero>(url, httpOptions).pipe(
